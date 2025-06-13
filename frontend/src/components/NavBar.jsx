@@ -1,5 +1,5 @@
-import React from "react";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const routeTitles = {
   "/viajes": "Viajes",
@@ -10,6 +10,7 @@ const routeTitles = {
 export default function Navbar() {
   const location = useLocation();
   const title = routeTitles[location.pathname] || "Dashboard";
+  const { logout, user } = useAuth();
 
   return (
     <div className="w-full navbar bg-base-100 shadow-md px-4">
@@ -36,6 +37,7 @@ export default function Navbar() {
       </div>
       <div className="flex-none">
         <div className="dropdown dropdown-end">
+          <span className="text-sm mr-2">{user.username}</span>
           <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
             <div className="w-10 rounded-full">
               <img src="https://i.pravatar.cc/300" alt="avatar" />
@@ -45,7 +47,15 @@ export default function Navbar() {
             tabIndex={0}
             className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
           >
-            <li><a>Cerrar sesión</a></li>
+            <li>
+              <a
+                onClick={() => {
+                  logout();
+                }}
+              >
+                Cerrar sesión
+              </a>
+            </li>
           </ul>
         </div>
       </div>

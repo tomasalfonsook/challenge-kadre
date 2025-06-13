@@ -1,23 +1,44 @@
-const Viaje = require('../models/Viaje');
+const Viaje = require("../models/Viaje");
 
 const obtenerViajes = async (req, res) => {
-  const viajes = await Viaje.find({}).populate('createdBy', 'username');
+  const viajes = await Viaje.find({
+    deletedAt: null,
+  }).populate("createdBy", "username");
   res.json(viajes);
 };
 
 const obtenerViajesById = async (req, res) => {
   const { id } = req.params;
-  const viaje = await Viaje.findById(id).populate('createdBy', 'username');
+  const viaje = await Viaje.findById(id, { deletedAt: null }).populate(
+    "createdBy",
+    "username"
+  );
   if (!viaje) {
-    return res.status(404).json({ message: 'Viaje no encontrado' });
+    return res.status(404).json({ message: "Viaje no encontrado" });
   }
   res.json(viaje);
 };
 
 const crearViaje = async (req, res) => {
-  const { camion, conductor, origen, destino, combustible, cantidad_litros, fecha_salida } = req.body;
-  if (!camion || !conductor || !origen || !destino || !combustible || !cantidad_litros || !fecha_salida) {
-    return res.status(400).json({ message: 'Faltan campos obligatorios' });
+  const {
+    camion,
+    conductor,
+    origen,
+    destino,
+    combustible,
+    cantidad_litros,
+    fecha_salida,
+  } = req.body;
+  if (
+    !camion ||
+    !conductor ||
+    !origen ||
+    !destino ||
+    !combustible ||
+    !cantidad_litros ||
+    !fecha_salida
+  ) {
+    return res.status(400).json({ message: "Faltan campos obligatorios" });
   }
   const newViaje = new Viaje({
     camion,
@@ -27,6 +48,7 @@ const crearViaje = async (req, res) => {
     combustible,
     cantidad_litros,
     fecha_salida,
+    estado: "En tránsito",
     createdBy: req.user._id,
   });
   await newViaje.save();
@@ -37,26 +59,34 @@ const eliminarViaje = async (req, res) => {
   const { id } = req.params;
   const viaje = await Viaje.findById(id);
   if (!viaje) {
-    return res.status(404).json({ message: 'Viaje no encontrado' });
+    return res.status(404).json({ message: "Viaje no encontrado" });
   }
-  if (viaje.createdBy.toString() !== req.user._id.toString()) {
-    return res.status(403).json({ message: 'No autorizado para eliminar este viaje' });
-  }
-  await viaje.remove();
-  res.json({ message: 'Viaje eliminado correctamente' });
+  await Viaje.findByIdAndUpdate(id, { deletedAt: new Date() });
+  res.json({ message: "Viaje eliminado correctamente" });
 };
 
 const actualizarViaje = async (req, res) => {
   const { id } = req.params;
-  const { camion, conductor, origen, destino, combustible, cantidad_litros, fecha_salida } = req.body;
+  const {
+    camion,
+    conductor,
+    origen,
+    destino,
+    combustible,
+    cantidad_litros,
+    fecha_salida,
+    estado,
+  } = req.body;
 
   const viaje = await Viaje.findById(id);
   if (!viaje) {
-    return res.status(404).json({ message: 'Viaje no encontrado' });
+    return res.status(404).json({ message: "Viaje no encontrado" });
   }
 
   if (viaje.createdBy.toString() !== req.user._id.toString()) {
-    return res.status(403).json({ message: 'No autorizado para actualizar este viaje' });
+    return res
+      .status(403)
+      .json({ message: "No autorizado para actualizar este viaje" });
   }
 
   viaje.camion = camion || viaje.camion;
@@ -66,9 +96,16 @@ const actualizarViaje = async (req, res) => {
   viaje.combustible = combustible || viaje.combustible;
   viaje.cantidad_litros = cantidad_litros || viaje.cantidad_litros;
   viaje.fecha_salida = fecha_salida || viaje.fecha_salida;
+  viaje.estado = estado || viaje.estado;
 
   await viaje.save();
   res.json(viaje);
 };
 
-module.exports = { obtenerViajes, obtenerViajesById, crearViaje, eliminarViaje, actualizarViaje };
+module.exports = {
+  obtenerViajes,
+  obtenerViajesById,
+  crearViaje,
+  eliminarViaje,
+  actualizarViaje,
+};

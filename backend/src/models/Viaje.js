@@ -13,9 +13,10 @@ const viajeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  }
+  },
+  deletedAt: { type: Date, default: null },
 }, {
-  timestamps: true
+  timestamps: true,
 });
 
 module.exports = mongoose.model('Viaje', viajeSchema);
