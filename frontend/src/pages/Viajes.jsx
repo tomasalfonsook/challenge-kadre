@@ -30,7 +30,7 @@ export default function Viajes() {
     { key: "origen", label: "Origen", type: "text" },
     { key: "destino", label: "Destino", type: "text" },
     { key: "combustible", label: "Combustible", type: "text" },
-    { key: "cantidad_litros", label: "Cantidad (L)", type: "number" },
+    { key: "cantidad_litros", label: "Cantidad (L)", type: "number", additionalText: "Max. 30.000L" },
     { key: "fecha_salida", label: "Fecha", type: "date" },
     {
       key: "estado",
@@ -115,11 +115,13 @@ export default function Viajes() {
           text: "Viaje eliminado correctamente",
           type: "success",
         });
+        setTimeout(() => setMessage(null), 3000);
       } catch (error) {
         setMessage({
           text: "Error al eliminar viaje",
           type: "error",
         });
+        setTimeout(() => setMessage(null), 3000);
       }
     }
   };
@@ -208,10 +210,13 @@ export default function Viajes() {
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {columns.map(({ key, label, type, options }) => (
+            {columns.map(({ key, label, type, options, additionalText }) => (
               <div key={key} className="form-control ">
-                <label className="label">
+                <label className="label flex w-full justify-between">
                   <span className="label-text">{label}</span>
+                  {additionalText && (
+                    <span className="label-text text-sm text-primary">{additionalText}</span>
+                  )}
                 </label>
                 {type === "select" ? (
                   <select
@@ -234,9 +239,23 @@ export default function Viajes() {
                   <input
                     type={type}
                     name={key}
+                    min={
+                      type === "number"
+                        ? 0
+                        : type === "date"
+                        ? dayjs().format("YYYY-MM-DD")
+                        : undefined
+                    }
                     value={formData[key]}
                     onChange={handleInputChange}
-                    className="input input-bordered w-full"
+                    className={`input input-bordered w-full ${
+                      (type === "number" && formData[key] < 0) ||
+                      (type === "number" && formData[key] > 30000) ||
+                      (type === "date" &&
+                        dayjs(formData[key]).isBefore(dayjs().startOf("day")))
+                        ? "input-error"
+                        : ""
+                    }`}
                     required
                   />
                 )}
@@ -244,7 +263,18 @@ export default function Viajes() {
             ))}
           </div>
           <div className="flex justify-end">
-            <button type="submit" className="btn btn-success mt-4">
+            <button
+              type="submit"
+              className={`btn btn-success mt-4 ${
+                Object.values(formData).some((value) => !value) ||
+                (formData.fecha_salida &&
+                  dayjs(formData.fecha_salida).isBefore(dayjs().startOf("day"))) ||
+                (formData.cantidad_litros && formData.cantidad_litros < 0) ||
+                (formData.cantidad_litros && formData.cantidad_litros > 30000)  
+                  ? "btn-disabled"
+                  : ""
+              }`}
+            >
               Guardar Viaje
             </button>
           </div>

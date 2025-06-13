@@ -1,4 +1,6 @@
-import React from "react";
+
+import { TruckIcon } from '@heroicons/react/24/outline';
+
 import { NavLink } from "react-router-dom";
 
 export default function SideNav() {
@@ -13,9 +15,14 @@ export default function SideNav() {
         <li>
           <NavLink
             to="/viajes"
-            className={({ isActive }) => (isActive ? "text-primary" : "")}
+            className={({ isActive }) =>
+              isActive ? "text-primary font-bold" : ""
+            }
           >
-            Viajes
+            <div className="flex items-center gap-2 p-2">
+<TruckIcon className="h-6 w-6" />
+              <h4 className="text-lg ">Viajes</h4>
+            </div>
           </NavLink>
         </li>
       </ul>
