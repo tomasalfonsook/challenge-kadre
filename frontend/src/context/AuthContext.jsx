@@ -31,7 +31,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (token) => {
-    localStorage.setItem("token", token); // 🔁 guardás solo el token
+    localStorage.setItem("token", token);
+    window.location.href = "/";
     fetchUser();
   };
 

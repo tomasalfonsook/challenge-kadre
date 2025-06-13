@@ -11,13 +11,11 @@ export default function SideNav() {
 
       <ul className="menu w-full mt-4">
         <li>
-          <NavLink to="/viajes" className={({ isActive }) => isActive ? "text-primary" : ""}>
+          <NavLink
+            to="/viajes"
+            className={({ isActive }) => (isActive ? "text-primary" : "")}
+          >
             Viajes
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/usuarios" className={({ isActive }) => isActive ? "text-primary" : ""}>
-            Usuarios
           </NavLink>
         </li>
       </ul>

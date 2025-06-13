@@ -3,7 +3,6 @@ import { useAuth } from "../context/AuthContext";
 
 const routeTitles = {
   "/viajes": "Viajes",
-  "/usuarios": "Usuarios",
   "/": "Panel de control",
 };
 

@@ -2,28 +2,38 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { restLink } from "../services/config";
 
-export default function Login() {
+export default function Register() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setStatus("Las contraseñas no coinciden");
+      setTimeout(() => setStatus(null), 5000);
+      return;
+    }
+
     setStatus("loading");
 
     try {
-      const response = await restLink.post("auth/login", {
+      const response = await restLink.post("auth/register", {
         username,
         password,
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         const { token } = response.data;
         login(token);
+        setStatus("success");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 2000);
       } else {
         setStatus("error");
-        setTimeout(() => setStatus(null), 5000);
       }
     } catch (err) {
       setStatus(err.response?.data?.message || "error");
@@ -41,7 +51,7 @@ export default function Login() {
           </div>
 
           <h2 className="card-title text-center text-2xl font-bold mb-6 justify-center">
-            Iniciar sesión
+            Crear cuenta
           </h2>
 
           <div className="form-control">
@@ -72,17 +82,31 @@ export default function Login() {
             />
           </div>
 
+          <div className="form-control mt-4">
+            <label className="label">
+              <span className="label-text">Confirmar contraseña</span>
+            </label>
+            <input
+              type="password"
+              placeholder="********"
+              className="input input-bordered w-full"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
           <div className="form-control mt-6">
             <button type="submit" className="btn btn-primary w-full">
-              Entrar
+              Registrarse
             </button>
           </div>
 
           <div className="form-control mt-4">
             <p className="text-center">
-              ¿No tienes una cuenta?{" "}
-              <a href="/register" className="link link-primary font-bold">
-                Regístrate aquí
+              ¿Ya tienes cuenta?{" "}
+              <a href="/login" className="link link-primary font-bold">
+                Inicia sesión
               </a>
             </p>
           </div>
@@ -95,16 +119,22 @@ export default function Login() {
               <span className="loading loading-dots loading-sm"></span>
             </div>
           )}
-          {status && status !== "loading" && (
+          {status === "success" && (
+            <div
+              role="alert"
+              className="alert alert-success text-white mt-4 justify-center"
+            >
+              <span className="text-center font-bold">
+                ✅ Cuenta creada correctamente. Redirigiendo...
+              </span>
+            </div>
+          )}
+          {status && status !== "loading" && status !== "success" && (
             <div
               role="alert"
               className="alert alert-error text-white mt-4 justify-center"
             >
-              <span className="text-center font-bold">
-                {status === "error"
-                  ? "😞 Ha ocurrido un error al iniciar sesión"
-                  : `✖️ ${status}`}
-              </span>
+              <span className="text-center font-bold">✖️ {status}</span>
             </div>
           )}
         </form>

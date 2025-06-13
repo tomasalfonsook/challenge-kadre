@@ -10,6 +10,7 @@ export default function Viajes() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
+  const [message, setMessage] = useState(null);
   const [formData, setFormData] = useState({
     camion: "",
     conductor: "",
@@ -110,9 +111,15 @@ export default function Viajes() {
       try {
         await restLink.delete(`/viajes/${viaje._id}`);
         fetchViajes();
+        setMessage({
+          text: "Viaje eliminado correctamente",
+          type: "success",
+        });
       } catch (error) {
-        console.error("Error al eliminar viaje:", error);
-        alert("Error al eliminar viaje");
+        setMessage({
+          text: "Error al eliminar viaje",
+          type: "error",
+        });
       }
     }
   };
@@ -143,9 +150,19 @@ export default function Viajes() {
       });
       setShowForm(false);
       fetchViajes();
+      setMessage({
+        text: formData._id
+          ? "Viaje actualizado correctamente"
+          : "Viaje creado correctamente",
+        type: "success",
+      });
+      setTimeout(() => setMessage(null), 3000);
     } catch (error) {
-      console.error("Error al crear viaje:", error);
-      alert("Error al crear viaje");
+      setMessage({
+        text: "Error al crear/actualizar viaje",
+        type: "error",
+      });
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -168,6 +185,17 @@ export default function Viajes() {
           {showForm ? "Cancelar" : "Nuevo Viaje"}
         </button>
       </div>
+
+      {message && (
+        <div
+          role="alert"
+          className={`alert alert-${
+            message.type || "info"
+          } text-white mt-4 justify-center mb-4`}
+        >
+          <span className="text-center font-bold">{message.text}</span>
+        </div>
+      )}
 
       {showForm && (
         <form
@@ -270,7 +298,7 @@ export default function Viajes() {
           <tbody>
             {paginatedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="py-8 text-center">
+                <td colSpan={columns.length + 1} className="py-8 text-center">
                   No se encontraron resultados
                 </td>
               </tr>
