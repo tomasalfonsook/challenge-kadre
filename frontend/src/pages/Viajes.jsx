@@ -30,7 +30,12 @@ export default function Viajes() {
     { key: "origen", label: "Origen", type: "text" },
     { key: "destino", label: "Destino", type: "text" },
     { key: "combustible", label: "Combustible", type: "text" },
-    { key: "cantidad_litros", label: "Cantidad (L)", type: "number", additionalText: "Max. 30.000L" },
+    {
+      key: "cantidad_litros",
+      label: "Cantidad (L)",
+      type: "number",
+      additionalText: "Max. 30.000L",
+    },
     { key: "fecha_salida", label: "Fecha", type: "date" },
     {
       key: "estado",
@@ -100,7 +105,14 @@ export default function Viajes() {
 
   const handleEdit = (viaje) => {
     setFormData({
-      ...viaje,
+      _id: viaje._id,
+      camion: viaje.camion,
+      conductor: viaje.conductor,
+      origen: viaje.origen,
+      destino: viaje.destino,
+      combustible: viaje.combustible,
+      cantidad_litros: viaje.cantidad_litros,
+      estado: viaje.estado,
       fecha_salida: dayjs(viaje.fecha_salida).format("YYYY-MM-DD"),
     });
     setShowForm(true);
@@ -161,7 +173,9 @@ export default function Viajes() {
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       setMessage({
-        text: "Error al crear/actualizar viaje",
+        text: error?.response?.data?.errors
+          ? error?.response?.data?.errors[0]?.msg
+          : "Error al crear/actualizar viaje",
         type: "error",
       });
       setTimeout(() => setMessage(null), 3000);
@@ -215,7 +229,9 @@ export default function Viajes() {
                 <label className="label flex w-full justify-between">
                   <span className="label-text">{label}</span>
                   {additionalText && (
-                    <span className="label-text text-sm text-primary">{additionalText}</span>
+                    <span className="label-text text-sm text-primary">
+                      {additionalText}
+                    </span>
                   )}
                 </label>
                 {type === "select" ? (

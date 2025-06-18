@@ -22,11 +22,17 @@ export default function Login() {
         const { token } = response.data;
         login(token);
       } else {
-        setStatus("error");
+        setStatus(
+          response?.data?.errors ? response?.data?.errors[0]?.msg : "error"
+        );
         setTimeout(() => setStatus(null), 5000);
       }
     } catch (err) {
-      setStatus(err.response?.data?.message || "error");
+      setStatus(
+        err.response?.data?.errors
+          ? err.response?.data?.errors[0]?.msg
+          : err.response?.data?.message || "error"
+      );
       setTimeout(() => setStatus(null), 5000);
     }
   };
